@@ -17,9 +17,27 @@ interface SwiftQuizProps {
   setDarkMode: (value: boolean) => void;
 }
 
+interface Question {
+  id: number;
+  category: string;
+  question: string;
+  options: string[];
+  correct: number;
+  hint: string;
+  explanation: string;
+}
+
+interface QuizProgress {
+  currentSet: number;
+  userAnswers: Record<number, number>;
+  revealedAnswers: Record<number, boolean>;
+  showHints: Record<number, boolean>;
+  quizCompleted: boolean;
+}
+
 const SwiftQuiz: React.FC<SwiftQuizProps> = ({ darkMode, setDarkMode }) => {
   // Question data structure
-  const questions = [
+  const questions: Question[] = [
     // Swift Fundamentals (1-20)
     {
       id: 1,
@@ -1132,23 +1150,63 @@ const SwiftQuiz: React.FC<SwiftQuizProps> = ({ darkMode, setDarkMode }) => {
   ];
 
   // State management
-  const [currentSet, setCurrentSet] = useState(0);
-  const [userAnswers, setUserAnswers] = useState({});
-  const [revealedAnswers, setRevealedAnswers] = useState({});
-  const [showHints, setShowHints] = useState({});
-  const [quizCompleted, setQuizCompleted] = useState(false);
+  const [currentSet, setCurrentSet] = useState<number>(0);
+  const [userAnswers, setUserAnswers] = useState<Record<number, number>>({});
+  const [revealedAnswers, setRevealedAnswers] = useState<
+    Record<number, boolean>
+  >({});
+  const [showHints, setShowHints] = useState<Record<number, boolean>>({});
+  const [quizCompleted, setQuizCompleted] = useState<boolean>(false);
+
+  // Load saved progress on mount
+  useEffect(() => {
+    const savedProgress = localStorage.getItem("swift-quiz-progress");
+    if (savedProgress) {
+      try {
+        const progress: QuizProgress = JSON.parse(savedProgress);
+        setCurrentSet(progress.currentSet || 0);
+        setUserAnswers(progress.userAnswers || {});
+        setRevealedAnswers(progress.revealedAnswers || {});
+        setShowHints(progress.showHints || {});
+        setQuizCompleted(progress.quizCompleted || false);
+      } catch (error) {
+        console.log("Error loading saved progress:", error);
+      }
+    }
+
+    // Load dark mode preference
+    const savedDarkMode = localStorage.getItem("swift-quiz-dark-mode");
+    if (savedDarkMode) {
+      setDarkMode(savedDarkMode === "true");
+    }
+  }, [setDarkMode]);
+
+  // Save progress whenever state changes
+  useEffect(() => {
+    const progress: QuizProgress = {
+      currentSet,
+      userAnswers,
+      revealedAnswers,
+      showHints,
+      quizCompleted,
+    };
+    localStorage.setItem("swift-quiz-progress", JSON.stringify(progress));
+  }, [currentSet, userAnswers, revealedAnswers, showHints, quizCompleted]);
 
   const questionsPerSet = 3;
   const totalSets = Math.ceil(questions.length / questionsPerSet);
 
   // Get current questions for the set
-  const getCurrentQuestions = () => {
+  const getCurrentQuestions = (): Question[] => {
     const startIndex = currentSet * questionsPerSet;
     return questions.slice(startIndex, startIndex + questionsPerSet);
   };
 
   // Handle answer selection
-  const handleAnswerSelect = (questionId, answerIndex) => {
+  const handleAnswerSelect = (
+    questionId: number,
+    answerIndex: number
+  ): void => {
     setUserAnswers((prev) => ({
       ...prev,
       [questionId]: answerIndex,
@@ -1156,7 +1214,7 @@ const SwiftQuiz: React.FC<SwiftQuizProps> = ({ darkMode, setDarkMode }) => {
   };
 
   // Toggle hint visibility
-  const toggleHint = (questionId) => {
+  const toggleHint = (questionId: number): void => {
     setShowHints((prev) => ({
       ...prev,
       [questionId]: !prev[questionId],
@@ -1164,7 +1222,7 @@ const SwiftQuiz: React.FC<SwiftQuizProps> = ({ darkMode, setDarkMode }) => {
   };
 
   // Reveal correct answer
-  const revealAnswer = (questionId) => {
+  const revealAnswer = (questionId: number): void => {
     setRevealedAnswers((prev) => ({
       ...prev,
       [questionId]: true,
@@ -1172,22 +1230,28 @@ const SwiftQuiz: React.FC<SwiftQuizProps> = ({ darkMode, setDarkMode }) => {
   };
 
   // Navigation functions
-  const goToPreviousSet = () => {
+  const goToPreviousSet = (): void => {
     if (currentSet > 0) {
       setCurrentSet(currentSet - 1);
+      // Scroll to top smoothly
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
-  const goToNextSet = () => {
+  const goToNextSet = (): void => {
     if (currentSet < totalSets - 1) {
       setCurrentSet(currentSet + 1);
+      // Scroll to top smoothly
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       setQuizCompleted(true);
+      // Scroll to top smoothly
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   // Calculate score
-  const calculateScore = () => {
+  const calculateScore = (): number => {
     let correct = 0;
     questions.forEach((question) => {
       if (userAnswers[question.id] === question.correct) {
@@ -1198,17 +1262,24 @@ const SwiftQuiz: React.FC<SwiftQuizProps> = ({ darkMode, setDarkMode }) => {
   };
 
   // Reset quiz
-  const resetQuiz = () => {
+  const resetQuiz = (): void => {
     setCurrentSet(0);
     setUserAnswers({});
     setRevealedAnswers({});
     setShowHints({});
     setQuizCompleted(false);
+    // Clear saved progress
+    localStorage.removeItem("swift-quiz-progress");
+    // Scroll to top smoothly
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // Toggle dark mode
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
+  const toggleDarkMode = (): void => {
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    // Save dark mode preference
+    localStorage.setItem("swift-quiz-dark-mode", newDarkMode.toString());
   };
 
   // Quiz completion screen
@@ -1446,7 +1517,7 @@ const SwiftQuiz: React.FC<SwiftQuizProps> = ({ darkMode, setDarkMode }) => {
 
       {/* Questions */}
       <div className="space-y-8">
-        {currentQuestions.map((question, index) => (
+        {currentQuestions.map((question) => (
           <div
             key={question.id}
             className={`border rounded-2xl p-8 transition-all duration-300 hover:shadow-lg ${
