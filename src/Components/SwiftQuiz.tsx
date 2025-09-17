@@ -8,6 +8,8 @@ import {
   RotateCcw,
   Moon,
   Sun,
+  Award,
+  BookOpen,
 } from "lucide-react";
 
 interface SwiftQuizProps {
@@ -1216,59 +1218,83 @@ const SwiftQuiz: React.FC<SwiftQuizProps> = ({ darkMode, setDarkMode }) => {
 
     return (
       <div
-        className={`max-w-4xl mx-auto p-6 rounded-lg shadow-lg transition-colors duration-300 ${
-          darkMode ? "bg-gray-900 text-white" : "bg-white text-gray-800"
+        className={`max-w-5xl mx-auto p-8 rounded-2xl shadow-2xl transition-all duration-500 ${
+          darkMode
+            ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white border border-gray-700"
+            : "bg-gradient-to-br from-white via-gray-50 to-white text-gray-900 border border-gray-200"
         }`}
       >
         {/* Dark Mode Toggle */}
-        <div className="flex justify-end mb-4">
+        <div className="flex justify-end mb-6">
           <button
             onClick={toggleDarkMode}
-            className={`p-2 rounded-lg transition-colors duration-300 ${
+            className={`p-3 rounded-xl transition-all duration-300 transform hover:scale-105 ${
               darkMode
-                ? "bg-gray-800 hover:bg-gray-700 text-yellow-400"
-                : "bg-gray-100 hover:bg-gray-200 text-gray-600"
+                ? "bg-gray-800 hover:bg-gray-700 text-yellow-400 shadow-lg"
+                : "bg-gray-100 hover:bg-gray-200 text-gray-600 shadow-md"
             }`}
             title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
           >
             {darkMode ? (
-              <Sun className="w-5 h-5" />
+              <Sun className="w-6 h-6" />
             ) : (
-              <Moon className="w-5 h-5" />
+              <Moon className="w-6 h-6" />
             )}
           </button>
         </div>
 
         <div className="text-center">
-          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+          <div className="relative mb-8">
+            <Award className="w-24 h-24 text-yellow-500 mx-auto mb-6 drop-shadow-lg" />
+            <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-white text-sm font-bold animate-pulse">
+              ✨
+            </div>
+          </div>
+
           <h1
-            className={`text-3xl font-bold mb-4 ${
-              darkMode ? "text-white" : "text-gray-800"
-            }`}
+            className={`text-4xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent`}
           >
             Quiz Complete!
           </h1>
-          <div className="text-6xl font-bold text-blue-600 mb-2">
-            {percentage}%
-          </div>
-          <div
-            className={`text-xl mb-6 ${
-              darkMode ? "text-gray-300" : "text-gray-600"
-            }`}
-          >
-            You scored {score} out of {questions.length} questions
+
+          <div className="relative mb-8">
+            <div
+              className={`text-7xl font-black mb-4 ${
+                percentage >= 90
+                  ? "text-green-500"
+                  : percentage >= 80
+                  ? "text-blue-500"
+                  : percentage >= 70
+                  ? "text-yellow-500"
+                  : "text-red-500"
+              }`}
+            >
+              {percentage}%
+            </div>
+            <div
+              className={`text-xl mb-8 ${
+                darkMode ? "text-gray-300" : "text-gray-600"
+              }`}
+            >
+              You scored{" "}
+              <span className="font-bold text-blue-600">{score}</span> out of{" "}
+              <span className="font-bold">{questions.length}</span> questions
+            </div>
           </div>
 
           <div
-            className={`rounded-lg p-6 mb-6 ${
-              darkMode ? "bg-gray-800" : "bg-gray-50"
+            className={`rounded-2xl p-8 mb-8 shadow-inner ${
+              darkMode
+                ? "bg-gray-800/50 border border-gray-700"
+                : "bg-gray-50/50 border border-gray-200"
             }`}
           >
             <h2
-              className={`text-xl font-semibold mb-4 ${
+              className={`text-2xl font-bold mb-6 flex items-center justify-center gap-3 ${
                 darkMode ? "text-white" : "text-gray-800"
               }`}
             >
+              <BookOpen className="w-6 h-6 text-blue-500" />
               Performance Breakdown
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -1300,12 +1326,26 @@ const SwiftQuiz: React.FC<SwiftQuizProps> = ({ darkMode, setDarkMode }) => {
                 return (
                   <div
                     key={category}
-                    className={`flex justify-between ${
-                      darkMode ? "text-gray-300" : "text-gray-700"
+                    className={`flex justify-between items-center p-3 rounded-lg ${
+                      darkMode ? "bg-gray-700/50" : "bg-white/50"
                     }`}
                   >
-                    <span>{category}:</span>
-                    <span className="font-medium">
+                    <span
+                      className={`font-medium ${
+                        darkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
+                    >
+                      {category}:
+                    </span>
+                    <span
+                      className={`font-bold px-3 py-1 rounded-full text-xs ${
+                        categoryPercentage >= 80
+                          ? "bg-green-100 text-green-800"
+                          : categoryPercentage >= 60
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
                       {categoryScore}/{categoryQuestions.length} (
                       {categoryPercentage}%)
                     </span>
@@ -1317,9 +1357,9 @@ const SwiftQuiz: React.FC<SwiftQuizProps> = ({ darkMode, setDarkMode }) => {
 
           <button
             onClick={resetQuiz}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg flex items-center mx-auto"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold flex items-center mx-auto transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
           >
-            <RotateCcw className="w-5 h-5 mr-2" />
+            <RotateCcw className="w-5 h-5 mr-3" />
             Retake Quiz
           </button>
         </div>
@@ -1331,70 +1371,73 @@ const SwiftQuiz: React.FC<SwiftQuizProps> = ({ darkMode, setDarkMode }) => {
 
   return (
     <div
-      className={`max-w-4xl mx-auto p-6 rounded-lg shadow-lg transition-colors duration-300 ${
-        darkMode ? "bg-gray-900 text-white" : "bg-white text-gray-800"
+      className={`max-w-5xl mx-auto p-8 rounded-2xl shadow-2xl transition-all duration-500 ${
+        darkMode
+          ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white border border-gray-700"
+          : "bg-gradient-to-br from-white via-gray-50 to-white text-gray-900 border border-gray-200"
       }`}
     >
       {/* Dark Mode Toggle */}
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-end mb-6">
         <button
           onClick={toggleDarkMode}
-          className={`p-2 rounded-lg transition-colors duration-300 ${
+          className={`p-3 rounded-xl transition-all duration-300 transform hover:scale-105 ${
             darkMode
-              ? "bg-gray-800 hover:bg-gray-700 text-yellow-400"
-              : "bg-gray-100 hover:bg-gray-200 text-gray-600"
+              ? "bg-gray-800 hover:bg-gray-700 text-yellow-400 shadow-lg"
+              : "bg-gray-100 hover:bg-gray-200 text-gray-600 shadow-md"
           }`}
           title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
         >
           {darkMode ? (
-            <Sun className="w-5 h-5" />
+            <Sun className="w-6 h-6" />
           ) : (
-            <Moon className="w-5 h-5" />
+            <Moon className="w-6 h-6" />
           )}
         </button>
       </div>
 
       {/* Header */}
-      <div className="text-center mb-8">
+      <div className="text-center mb-10">
         <h1
-          className={`text-3xl font-bold mb-2 ${
-            darkMode ? "text-white" : "text-gray-800"
-          }`}
+          className={`text-4xl font-black mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent`}
         >
           Swift & SwiftUI Mastery Quiz
         </h1>
         <div
-          className={`text-lg mb-4 ${
+          className={`text-lg mb-6 ${
             darkMode ? "text-gray-300" : "text-gray-600"
           }`}
         >
-          210 Questions • Latest Swift 6.2 & iOS 18 Features
+          <span className="font-semibold">210 Questions</span> • Latest Swift
+          6.2 & iOS 18 Features
         </div>
         <div
-          className={`rounded-lg p-4 ${
-            darkMode ? "bg-gray-800" : "bg-blue-50"
+          className={`rounded-2xl p-6 shadow-inner ${
+            darkMode
+              ? "bg-gray-800/50 border border-gray-700"
+              : "bg-blue-50/50 border border-blue-200"
           }`}
         >
           <div
-            className={`flex justify-between items-center text-sm mb-2 ${
+            className={`flex justify-between items-center text-sm mb-4 ${
               darkMode ? "text-gray-400" : "text-gray-600"
             }`}
           >
-            <span>
+            <span className="font-medium">
               Set {currentSet + 1} of {totalSets}
             </span>
-            <span>
+            <span className="font-medium">
               Questions {currentSet * questionsPerSet + 1}-
               {Math.min((currentSet + 1) * questionsPerSet, questions.length)}
             </span>
           </div>
           <div
-            className={`w-full rounded-full h-2 ${
+            className={`w-full rounded-full h-3 shadow-inner ${
               darkMode ? "bg-gray-700" : "bg-gray-200"
             }`}
           >
             <div
-              className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+              className="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all duration-500 shadow-sm"
               style={{ width: `${((currentSet + 1) / totalSets) * 100}%` }}
             ></div>
           </div>
@@ -1406,19 +1449,28 @@ const SwiftQuiz: React.FC<SwiftQuizProps> = ({ darkMode, setDarkMode }) => {
         {currentQuestions.map((question, index) => (
           <div
             key={question.id}
-            className={`border rounded-lg p-6 transition-colors duration-300 ${
+            className={`border rounded-2xl p-8 transition-all duration-300 hover:shadow-lg ${
               darkMode
-                ? "border-gray-700 bg-gray-800"
-                : "border-gray-200 bg-white"
+                ? "border-gray-700 bg-gradient-to-br from-gray-800 to-gray-900 hover:border-gray-600"
+                : "border-gray-200 bg-gradient-to-br from-white to-gray-50 hover:border-gray-300"
             }`}
           >
-            <div className="flex items-start justify-between mb-4">
+            <div className="flex items-start justify-between mb-6">
               <div className="flex-1">
-                <div className="text-sm text-blue-600 font-medium mb-2">
-                  {question.category} • Question {question.id}
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-sm font-bold text-blue-600 bg-blue-100 px-3 py-1 rounded-full">
+                    {question.category}
+                  </span>
+                  <span
+                    className={`text-sm font-medium ${
+                      darkMode ? "text-gray-400" : "text-gray-500"
+                    }`}
+                  >
+                    Question {question.id}
+                  </span>
                 </div>
                 <h3
-                  className={`text-lg font-semibold mb-4 ${
+                  className={`text-xl font-bold leading-relaxed ${
                     darkMode ? "text-white" : "text-gray-800"
                   }`}
                 >
@@ -1427,10 +1479,10 @@ const SwiftQuiz: React.FC<SwiftQuizProps> = ({ darkMode, setDarkMode }) => {
               </div>
               <button
                 onClick={() => toggleHint(question.id)}
-                className={`ml-4 p-2 transition-colors ${
+                className={`ml-6 p-3 rounded-xl transition-all duration-300 transform hover:scale-110 ${
                   darkMode
-                    ? "text-gray-400 hover:text-blue-400"
-                    : "text-gray-400 hover:text-blue-500"
+                    ? "text-gray-400 hover:text-blue-400 bg-gray-700 hover:bg-gray-600"
+                    : "text-gray-400 hover:text-blue-500 bg-gray-100 hover:bg-blue-50"
                 }`}
                 title="Show hint"
               >
@@ -1441,37 +1493,37 @@ const SwiftQuiz: React.FC<SwiftQuizProps> = ({ darkMode, setDarkMode }) => {
             {/* Hint */}
             {showHints[question.id] && (
               <div
-                className={`border rounded-lg p-3 mb-4 transition-colors duration-300 ${
+                className={`border rounded-xl p-4 mb-6 transition-all duration-300 ${
                   darkMode
-                    ? "bg-yellow-900 border-yellow-700 text-yellow-200"
+                    ? "bg-yellow-900/30 border-yellow-700/50 text-yellow-200"
                     : "bg-yellow-50 border-yellow-200 text-yellow-800"
                 }`}
               >
-                <div className="text-sm">
-                  <strong>Hint:</strong> {question.hint}
+                <div className="text-sm font-medium">
+                  <span className="font-bold">💡 Hint:</span> {question.hint}
                 </div>
               </div>
             )}
 
             {/* Options */}
-            <div className="space-y-3 mb-4">
+            <div className="space-y-3 mb-6">
               {question.options.map((option, optionIndex) => {
                 const isSelected = userAnswers[question.id] === optionIndex;
                 const isCorrect = optionIndex === question.correct;
                 const isRevealed = revealedAnswers[question.id];
 
                 let buttonClass =
-                  "w-full text-left p-3 rounded-lg border transition-all ";
+                  "w-full text-left p-4 rounded-xl border transition-all duration-300 transform hover:scale-[1.02] font-medium ";
 
                 if (isRevealed) {
                   if (isCorrect) {
                     buttonClass += darkMode
-                      ? "bg-green-900 border-green-700 text-green-200"
-                      : "bg-green-50 border-green-300 text-green-800";
+                      ? "bg-green-900/50 border-green-700 text-green-200 shadow-lg"
+                      : "bg-green-50 border-green-300 text-green-800 shadow-md";
                   } else if (isSelected && !isCorrect) {
                     buttonClass += darkMode
-                      ? "bg-red-900 border-red-700 text-red-200"
-                      : "bg-red-50 border-red-300 text-red-800";
+                      ? "bg-red-900/50 border-red-700 text-red-200 shadow-lg"
+                      : "bg-red-50 border-red-300 text-red-800 shadow-md";
                   } else {
                     buttonClass += darkMode
                       ? "bg-gray-800 border-gray-600 text-gray-400"
@@ -1479,12 +1531,12 @@ const SwiftQuiz: React.FC<SwiftQuizProps> = ({ darkMode, setDarkMode }) => {
                   }
                 } else if (isSelected) {
                   buttonClass += darkMode
-                    ? "bg-blue-900 border-blue-700 text-blue-200"
-                    : "bg-blue-50 border-blue-300 text-blue-800";
+                    ? "bg-blue-900/50 border-blue-700 text-blue-200 shadow-lg"
+                    : "bg-blue-50 border-blue-300 text-blue-800 shadow-md";
                 } else {
                   buttonClass += darkMode
-                    ? "bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700"
-                    : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50";
+                    ? "bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700 hover:border-gray-500"
+                    : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 shadow-sm";
                 }
 
                 return (
@@ -1498,15 +1550,27 @@ const SwiftQuiz: React.FC<SwiftQuizProps> = ({ darkMode, setDarkMode }) => {
                     disabled={isRevealed}
                   >
                     <div className="flex items-center">
-                      <span className="w-6 h-6 rounded-full border flex items-center justify-center text-xs font-medium mr-3">
+                      <span
+                        className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-bold mr-4 ${
+                          isRevealed && isCorrect
+                            ? "border-green-500 bg-green-500 text-white"
+                            : isRevealed && isSelected && !isCorrect
+                            ? "border-red-500 bg-red-500 text-white"
+                            : isSelected
+                            ? "border-blue-500 bg-blue-500 text-white"
+                            : darkMode
+                            ? "border-gray-500"
+                            : "border-gray-300"
+                        }`}
+                      >
                         {String.fromCharCode(65 + optionIndex)}
                       </span>
-                      <span>{option}</span>
+                      <span className="flex-1">{option}</span>
                       {isRevealed && isCorrect && (
-                        <CheckCircle className="w-5 h-5 text-green-600 ml-auto" />
+                        <CheckCircle className="w-6 h-6 text-green-600 ml-4" />
                       )}
                       {isRevealed && isSelected && !isCorrect && (
-                        <XCircle className="w-5 h-5 text-red-600 ml-auto" />
+                        <XCircle className="w-6 h-6 text-red-600 ml-4" />
                       )}
                     </div>
                   </button>
@@ -1519,7 +1583,7 @@ const SwiftQuiz: React.FC<SwiftQuizProps> = ({ darkMode, setDarkMode }) => {
               !revealedAnswers[question.id] && (
                 <button
                   onClick={() => revealAnswer(question.id)}
-                  className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg text-sm transition-colors duration-300"
+                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
                 >
                   Reveal Correct Answer
                 </button>
@@ -1528,14 +1592,15 @@ const SwiftQuiz: React.FC<SwiftQuizProps> = ({ darkMode, setDarkMode }) => {
             {/* Explanation */}
             {revealedAnswers[question.id] && (
               <div
-                className={`mt-4 border rounded-lg p-4 transition-colors duration-300 ${
+                className={`mt-6 border rounded-xl p-5 transition-all duration-300 ${
                   darkMode
-                    ? "bg-blue-900 border-blue-700 text-blue-200"
+                    ? "bg-blue-900/30 border-blue-700/50 text-blue-200"
                     : "bg-blue-50 border-blue-200 text-blue-800"
                 }`}
               >
-                <div className="text-sm">
-                  <strong>Explanation:</strong> {question.explanation}
+                <div className="text-sm leading-relaxed">
+                  <span className="font-bold">📚 Explanation:</span>{" "}
+                  {question.explanation}
                 </div>
               </div>
             )}
@@ -1545,35 +1610,37 @@ const SwiftQuiz: React.FC<SwiftQuizProps> = ({ darkMode, setDarkMode }) => {
 
       {/* Navigation */}
       <div
-        className={`flex justify-between items-center mt-8 pt-6 border-t transition-colors duration-300 ${
+        className={`flex justify-between items-center mt-10 pt-8 border-t transition-all duration-300 ${
           darkMode ? "border-gray-700" : "border-gray-200"
         }`}
       >
         <button
           onClick={goToPreviousSet}
           disabled={currentSet === 0}
-          className={`flex items-center px-4 py-2 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
+          className={`flex items-center px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${
             darkMode
-              ? "text-gray-400 hover:text-blue-400"
-              : "text-gray-600 hover:text-blue-600"
+              ? "text-gray-400 hover:text-blue-400 bg-gray-800 hover:bg-gray-700 disabled:bg-gray-800"
+              : "text-gray-600 hover:text-blue-600 bg-gray-100 hover:bg-blue-50 disabled:bg-gray-100"
           }`}
         >
-          <ChevronLeft className="w-5 h-5 mr-1" />
+          <ChevronLeft className="w-5 h-5 mr-2" />
           Previous Set
         </button>
 
         <div
-          className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}
+          className={`text-sm font-medium px-4 py-2 rounded-lg ${
+            darkMode ? "text-gray-400 bg-gray-800" : "text-gray-500 bg-gray-100"
+          }`}
         >
           Set {currentSet + 1} of {totalSets}
         </div>
 
         <button
           onClick={goToNextSet}
-          className="flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-300"
+          className="flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
         >
           {currentSet === totalSets - 1 ? "Finish Quiz" : "Next Set"}
-          <ChevronRight className="w-5 h-5 ml-1" />
+          <ChevronRight className="w-5 h-5 ml-2" />
         </button>
       </div>
     </div>
